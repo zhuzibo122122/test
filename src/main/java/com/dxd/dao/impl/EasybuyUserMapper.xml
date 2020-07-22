@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.dxd.dao.EasybuyUserMapper">
+ 	<!-- 根据登录名查询对应的用户 -->
+ 	<select id="findEasybuyUserInfo" parameterType="String" resultMap="findEasybuyUserInfoMap">
+ 		SELECT `id`,`userName`,`loginName`,`password`,`sex`,`identityCode`,`email`,`mobile`,`type` FROM `easybuy_user` WHERE loginName = #{loginName}
+ 	</select>
+ 	<!-- 注册新用户 -->
+ 	<insert id="addRegisterInfo" parameterType="EasybuyUser">
+ 		INSERT INTO `easybuy_user`(`userName`,`loginName`,`password`,`sex`,`identityCode`,`email`,`mobile`,`type`)
+ 		VALUE(#{userName},#{loginName},#{password},#{sex},#{identityCode},#{email},#{mobile},#{type})
+ 	</insert>
+ 	<!-- 查询所有用户信息 -->
+ 	<select id="findEasybuyUserAll" parameterType="com.dxd.utils.Pager" resultMap="findEasybuyUserInfoMap">
+ 		<bind name="key_sum" value="(currentPage-1)*rowPerPage"/>
+ 		SELECT `id`,`userName`,`loginName`,`password`,`sex`,`identityCode`,`email`,`mobile`,`type` 
+ 		FROM `easybuy_user` LIMIT #{key_sum},#{rowPerPage}
+ 	</select>
+ 	<!-- 根据ID删除用户 -->
+ 	<delete id="delEasybuyUserById" parameterType="int">
+ 		DELETE FROM `easybuy_user` WHERE id=#{id}
+ 	</delete>
+ 	<!-- 查询该用户是否有订单 -->
+ 	<select id="checkOrderByid" parameterType="int" resultType="int">
+ 		SELECT COUNT(1) FROM  `easybuy_order` WHERE userId = #{userId} and `status` IN (1,2,3,4)
+ 	</select>
+ 	<!-- 删除该用户的收货地址 -->
+ 	<delete id="delAddressByid" parameterType="int">
+ 		DELETE FROM `easybuy_user_address` WHERE userId = #{userId}
+ 	</delete>
+ 	<!-- 查询用户信息总条数 -->
+ 	<select id="getTotalCount" resultType="int">
+ 		SELECT COUNT(1) FROM `easybuy_user`
+ 	</select>
+ 	<!-- 根据id查询对应用户信息 -->
+ 	<select id="findEasybuyUserById" parameterType="int" resultMap="findEasybuyUserInfoMap">
+ 		SELECT `id`,`userName`,`loginName`,`password`,`sex`,`identityCode`,`email`,`mobile`,`type` FROM `easybuy_user` WHERE id = #{id}
+ 	</select>
+ 	<!-- 根据id修改用户信息 -->
+ 	<update id="modifyEasybuyUserById" parameterType="EasybuyUser">
+ 		UPDATE `easybuy_user` SET `userName`=#{userName},`loginName`=#{loginName},`sex`=#{sex},`identityCode`=#{identityCode},`email`=#{email},`mobile`=#{mobile},`type`=#{type} WHERE id=#{id}
+ 	</update>
+ 	<!-- 查询是否存在相同的用户名 -->
+ 	<select id="findLoginNameByName" parameterType="String" resultType="int">
+ 		SELECT COUNT(1) FROM `easybuy_user` WHERE loginName=#{name}
+ 	</select>
+ 	<!-- 根据用户名修改密码 -->
+ 	<update id="updateUserPasswordBy">
+ 		UPDATE `easybuy_user` SET `password`=#{password} WHERE loginName=#{loginName}
+ 	</update>
+ 	<!-- 得到该用户所有订单号 -->
+ 	<select id="getAllOrderIdByuserId" parameterType="int" resultType="int">
+ 		SELECT `id` FROM `easybuy_order` WHERE userId=#{userId}
+ 	</select>
+ 	<resultMap type="EasybuyUser" id="findEasybuyUserInfoMap">
+ 		<id column="id" property="id"/>
+ 		<result column="loginName" property="loginName"/>
+ 		<result column="userName" property="userName"/>
+ 		<result column="password" property="password"/>
+ 		<result column="sex" property="sex"/>
+ 		<result column="identityCode" property="identityCode"/>
+ 		<result column="email" property="email"/>
+ 		<result column="mobile" property="mobile"/>
+ 		<result column="type" property="type"/>
+ 	</resultMap>
+ </mapper>

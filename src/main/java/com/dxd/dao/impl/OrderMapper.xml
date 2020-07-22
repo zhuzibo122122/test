@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.dxd.dao.OrderMapper">
+ 	<!-- 确认订单 -->
+ 	<update id="confrimOrder" parameterType="int">
+ 		UPDATE `easybuy_order` SET `status`=5 WHERE id = #{orderId}
+ 	</update>
+ 	<!-- 保存订单信息 -->
+ 	<insert id="saveOrder" parameterType="EasybuyOrder">
+ 		INSERT INTO `easybuy_order`(`userId`,`loginName`,`userAddress`,`createTime`,`cost`,`status`,`type`,`serialNumber`)
+ 		VALUES(#{userId},#{loginName},#{userAddress},#{createTime},#{cost},#{status},#{type},#{serialNumber})
+ 	</insert>
+ 	<!-- 得到所有订单信息 -->
+ 	<select id="getAllOrder" parameterType="com.dxd.utils.Pager" resultMap="getAllOrderMap">
+ 		<bind name="key_pager" value="(currentPage-1)*rowPerPage"/>
+ 		SELECT `id`,`userId`,`loginName`,`userAddress`,`createTime`,`cost`,`status`,`type`,`serialNumber` 
+ 		FROM `easybuy_order` LIMIT #{key_pager},#{rowPerPage}
+ 	</select>
+ 	<!-- 查找对应用户的所有订单 -->
+ 	<select id="findEasybuyOrderList" resultMap="getAllOrderMap">
+ 		<bind name="key_pager" value="(Pager.currentPage-1)*Pager.rowPerPage"/>
+ 		SELECT `id`,`userId`,`loginName`,`userAddress`,`createTime`,`cost`,`status`,`type`,`serialNumber` 
+ 		FROM `easybuy_order` 
+ 		WHERE userId = #{userId} LIMIT #{key_pager},#{Pager.rowPerPage}
+ 	</select>
+ 	<!-- 得到该用户所有订单条数 -->
+ 	<select id="getOrderCount" resultType="int" parameterType="int">
+ 		SELECT COUNT(1) FROM `easybuy_order` WHERE userId = #{userId}
+ 	</select>
+ 	<!-- 获得总订单条数 -->
+ 	<select id="getTotalCount" resultType="int">
+ 		SELECT COUNT(1) FROM `easybuy_order`
+ 	</select>
+ 	<!-- 得到指定订单的详情 -->
+ 	<select id="getOrderDetail" parameterType="int" resultMap="getOrderDetailMap">
+ 		SELECT ed.`id`,ed.`orderId`,ed.`productId`,ed.`quantity`,ed.`cost`,ep.`name`,ep.`fileName` 
+ 		FROM `easybuy_order_detail` AS ed , `easybuy_product` AS ep 
+ 		WHERE ed.productId = ep.id AND orderId = #{orderId}
+ 	</select>
+ 	<!-- 根据订单号 查询订单id -->
+ 	<select id="getorderByserialNumber" parameterType="String" resultType="int">
+ 		SELECT `id` FROM `easybuy_order` WHERE `serialNumber` = #{serialNumber}
+ 	</select>
+ 	<!-- 删除该用户所有订单 -->
+ 	<delete id="delOrderByUserId" parameterType="int">
+ 		DELETE FROM `easybuy_order` WHERE userId = #{userId}
+ 	</delete>
+ 	<!-- 删除指定订单中的所有商品 -->
+ 	<delete id="delOrderProductByOrderId" parameterType="int">
+ 		DELETE FROM `easybuy_order_detail` WHERE orderId = #{orderId}
+ 	</delete>
+ 	<resultMap type="EasybuyOrderDetail" id="getOrderDetailMap">
+ 		<id column="id" property="id"/>
+ 		<result column="orderId" property="orderId"/>
+ 		<result column="productId" property="productId"/>
+ 		<result column="quantity" property="quantity"/>
+ 		<result column="cost" property="cost"/>
+ 		<result column="name" property="name"/>
+ 		<result column="fileName" property="fileName"/>
+ 	</resultMap>
+ 	<resultMap type="EasybuyOrder" id="getAllOrderMap">
+ 		<id column="id" property="id"/>
+ 		<result column="userId" property="userId"/>
+ 		<result column="loginName" property="loginName"/>
+ 		<result column="userAddress" property="userAddress"/>
+ 		<result column="createTime" property="createTime"/>
+ 		<result column="cost" property="cost"/>
+ 		<result column="status" property="status"/>
+ 		<result column="type" property="type"/>
+ 		<result column="serialNumber" property="serialNumber"/>
+ 	</resultMap>
+ </mapper>

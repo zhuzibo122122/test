@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dxd.dao.EasybuyUserAddressMapper">
+	<!-- 根据用户Id查询对应的收货地址 -->
+	<select id="findEasybuyUserAddressAll" parameterType="int" resultMap="findEasybuyUserAddressAllMap">
+		SELECT `id`,`address`,`createTime`,`userId`,`isDefault`,`remark` FROM `easybuy_user_address` WHERE userId = #{userId}
+	</select>
+	<!-- 根据登录ID新增地址 -->
+	<insert id="updateEasybuyUserAddressById" parameterType="EasybuyUserAddress">
+		INSERT INTO `easybuy_user_address`(`address`,`createTime`,`userId`,`isDefault`,`remark`)VALUES(#{address},#{createTime},#{userId},#{isDefault},#{remark})
+	</insert>
+	<!-- 根据id查询收货地址 -->
+	<select id="getUserAddressById" parameterType="int" resultMap="findEasybuyUserAddressAllMap">
+		SELECT `id`,`address`,`createTime`,`userId`,`isDefault`,`remark` FROM `easybuy_user_address` WHERE `id` = #{id}
+	</select>
+	<resultMap type="EasybuyUserAddress" id="findEasybuyUserAddressAllMap">
+		<id column="id" property="id"/>
+		<result column="address" property="address"/>
+		<result column="creteTime" property="createTime"/>
+		<result column="userId" property="userId"/>
+		<result column="isDefault" property="isDefault"/>
+		<result column="remark" property="remark"/>
+	</resultMap>
+</mapper>

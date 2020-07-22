@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dxd.dao.EasybuyCollectMapper">
+	<!-- 清空该用户购物车 -->
+	<delete id="delCart" parameterType="int">
+		DELETE FROM `easybuy_collect` WHERE `userId`= #{userId} AND `type`=1
+	</delete>
+	<!-- 收藏商品 -->
+	<insert id="addCollect">
+		INSERT INTO `easybuy_collect`(`userId`,`productId`,`productNum`,`type`)VALUES(#{userId},#{productId},#{productNum},#{type})
+	</insert>
+	<!-- 查询用户购物车信息 -->
+	<select id="selectId" parameterType="int" resultMap="selectIdMap">
+		SELECT ec.id,ec.userId,ec.productId,ec.productNum,ec.type,ep.id eid,ep.name,ep.description,ep.price,ep.stock,ep.categoryLevel1,ep.categoryLevel2,ep.categoryLevel3,ep.fileName,ep.isDelete FROM `easybuy_collect` AS ec,`easybuy_product` AS ep 
+		WHERE ec.productId = ep.id AND ec.userId = #{userId} AND ec.type =1
+	</select>
+	<!-- 查询用户收藏夹 -->
+	<select id="selectByUserId" parameterType="int" resultMap="selectByUserIdMap">
+		SELECT `id`,`userId`,`productId`,`productNum`,`type` FROM `easybuy_collect` WHERE userId = #{userId} and type=0
+	</select>
+	<!-- 删除收藏 -->
+	<delete id="delCollect" parameterType="EasybuyCollect">
+		DELETE FROM `easybuy_collect` WHERE userId = #{userId} AND productId = #{productId} and `type`=#{type}
+	</delete>
+	<!-- 判断用户是否重复收藏 -->
+	<select id="checkCollect" resultType="int">
+		SELECT COUNT(1) FROM `easybuy_collect` WHERE userId = #{userId} AND productId = #{productId} and `type`=0
+	</select>
+	<!-- 购物车商品数量+1 -->
+	<update id="addNum" >
+		UPDATE `easybuy_collect` SET productNum = productNum+1 WHERE userId = #{userId} AND productId = #{productId}
+	</update>
+	<!-- 购物车商品数量-1 -->
+	<update id="jianNum">
+		UPDATE `easybuy_collect` SET productNum = productNum-1 WHERE userId = #{userId} AND productId = #{productId} and `type` = 1
+	</update>
+	<!-- 购物车商品是否重复 -->
+	<select id="checkCart" resultType="int">
+		SELECT COUNT(1) FROM `easybuy_collect` WHERE userId=#{userId} AND productId = #{productId}  AND `type` = 1
+	</select>
+	<resultMap type="EasybuyCollect" id="selectByUserIdMap">
+		<id column="id" property="id"/>
+		<result column="userId" property="userId"/>
+		<result column="productId" property="productId"/>
+		<result column="productNum" property="productNum"/>
+		<result column="type" property="type"/>
+	</resultMap>
+	<resultMap type="EasybuyCollect" id="selectIdMap">
+		<id column="id" property="id"/>
+		<result column="userId" property="userId"/>
+		<result column="productId" property="productId"/>
+		<result column="productNum" property="productNum"/>
+		<result column="type" property="type"/>
+		<collection property="product" ofType="EasybuyProduct">
+			<id column="eid" property="id"/>
+			<result column="name" property="name"/>
+			<result column="description" property="description"/>
+			<result column="price" property="price"/>
+			<result column="stock" property="stock"/>
+			<result column="categoryLeve1" property="categoryLevel1"/>
+			<result column="categoryLeve2" property="categoryLevel2"/>
+			<result column="categoryLeve3" property="categoryLevel3"/>
+			<result column="fileName" property="fileName"/>
+			<result column="isDelete" property="isDelete"/>
+		</collection>
+	</resultMap>
+</mapper>

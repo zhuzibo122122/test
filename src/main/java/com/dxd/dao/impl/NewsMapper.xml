@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.dxd.dao.NewsMapper">
+ 	<!-- 查询所有咨询列表 -->
+ 	<select id="queryNewsList" parameterType="com.dxd.utils.Pager" resultMap="queryNewsListMap">
+ 		<bind name="key_pager" value="(currentPage-1)*rowPerPage"/>
+ 		SELECT `id`,`title`,`content`,`createTime` FROM `easybuy_news` 
+ 		ORDER BY `createTime` DESC LIMIT #{key_pager},#{rowPerPage}
+ 	</select>
+ 	<!-- 获得咨询列表总记录数 -->
+ 	<select id="getTotalCount" resultType="int">
+ 		SELECT COUNT(1) FROM `easybuy_news`
+ 	</select>
+ 	<!-- 根据ID查询咨询详情 -->
+ 	<select id="getNewsById" parameterType="int" resultMap="queryNewsListMap">
+ 		SELECT `id`,`title`,`content`,`createTime` FROM `easybuy_news` WHERE id = #{id}
+ 	</select>
+ 	<resultMap type="EasybuyNews" id="queryNewsListMap">
+ 		<id column="id" property="id"/>
+ 		<result column="title" property="title"/>
+ 		<result column="content" property="content"/>
+ 		<result column="createTime" property="createTime" javaType="java.util.Date"/>
+ 	</resultMap>
+ </mapper>

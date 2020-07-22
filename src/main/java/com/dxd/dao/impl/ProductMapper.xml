@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.dxd.dao.ProductMapper">
+ 	<!-- 获取所有商品信息 -->
+ 	<select id="getEasybuyProductList" resultMap="getEasybuyProductListMap">
+ 		SELECT `id`,`name`,`description`,`price`,`stock`,`categoryLevel1`,`categoryLevel2`,`categoryLevel3`,`fileName`,`isDelete` FROM `easybuy_product`
+ 	</select>
+ 	<!-- 获得所有商品信息(后端) -->
+ 	<select id="getAllProduct" parameterType="com.dxd.utils.Pager" resultMap="getEasybuyProductListMap">
+ 		<bind name="key_pager" value="(currentPage-1)*rowPerPage"/>
+ 		SELECT `id`,`name`,`description`,`price`,`stock`,`categoryLevel1`,`categoryLevel2`,`categoryLevel3`,`fileName`,`isDelete` 
+ 		FROM `easybuy_product` LIMIT #{key_pager},#{rowPerPage}
+ 	</select>
+ 	<!-- 修改商品 -->
+ 	<update id="updateEasybuyProduct" parameterType="EasybuyProduct">
+ 		UPDATE `easybuy_product` SET`name`=#{name},`description`=#{description},`price`=#{price},`stock`=#{stock},`categoryLevel1`=#{categoryLevel1},`categoryLevel2`=#{categoryLevel2},`categoryLevel3`=#{categoryLevel3},`fileName`=#{fileName},`isDelete`=#{isDelete} WHERE `id`=#{id}
+ 	</update>
+ 	<!-- 获得一级分类总记录数 -->
+ 	<select id="getProductRowCount" parameterType="int" resultType="int">
+ 		SELECT COUNT(1) FROM `easybuy_product` WHERE 1=1
+ 		<if test="categoryId != 0 and categoryId != null">
+ 			and `categoryLevel1` = #{categoryId}
+ 		</if>
+ 	</select>
+ 	<!-- 获得二级分类总记录数 -->
+ 	<select id="getProductRowCount2" parameterType="int" resultType="int">
+ 		SELECT COUNT(1) FROM `easybuy_product` WHERE `categoryLevel2` = #{categoryId}
+ 	</select>
+ 	<!-- 获得三级分类总记录数 -->
+ 	<select id="getProductRowCount3" parameterType="int" resultType="int">
+ 		SELECT COUNT(1) FROM `easybuy_product` WHERE `categoryLevel3` = #{categoryId}
+ 	</select>
+ 	<!-- 获得一级分类所有商品信息 (模糊查询) -->
+ 	<select id="getEasybuyProductListByCategoryId" resultMap="getEasybuyProductListMap">
+ 		<bind name="key_pager" value="(Pager.currentPage-1)*Pager.rowPerPage"/>
+ 		SELECT `id`,`name`,`description`,`price`,`stock`,`categoryLevel1`,`categoryLevel2`,`categoryLevel3`,`fileName`,`isDelete` FROM `easybuy_product` WHERE 1=1 
+ 		<if test="categoryId != 0 and categoryId != null"> 
+ 			and `categoryLevel1` = #{categoryId}
+ 		</if>
+ 		<if test="productName != '' and productName != null">
+ 			and `name` like concat('%',#{productName},'%')
+ 		</if>
+ 		limit #{key_pager},#{Pager.rowPerPage}
+ 	</select>
+ 	<!-- 获得模糊查询的信息数 -->
+ 	<select id="getmohuCount" parameterType="String" resultType="int">
+ 		SELECT COUNT(1) FROM `easybuy_product` WHERE `name` LIKE concat('%',#{proName},'%')
+ 	</select>
+ 	<!-- 获得二级分类所有商品 -->
+ 	<select id="getEasybuyProductListByCategoryId2" resultMap="getEasybuyProductListMap">
+ 		<bind name="key_pager" value="(Pager.currentPage-1)*Pager.rowPerPage"/>
+ 		SELECT `id`,`name`,`description`,`price`,`stock`,`categoryLevel1`,`categoryLevel2`,`categoryLevel3`,`fileName`,`isDelete` FROM `easybuy_product`
+ 		 WHERE `categoryLevel2` = #{categoryId} LIMIT #{key_pager},#{Pager.rowPerPage}
+ 	</select>
+ 	<!-- 获得三级分类所有商品信息 -->
+ 	<select id="getEasybuyProductListByCategoryId3" resultMap="getEasybuyProductListMap">
+ 		<bind name="key_pager" value="(Pager.currentPage-1)*Pager.rowPerPage"/>
+ 		SELECT `id`,`name`,`description`,`price`,`stock`,`categoryLevel1`,`categoryLevel2`,`categoryLevel3`,`fileName`,`isDelete` FROM `easybuy_product`
+ 		 WHERE `categoryLevel3` = #{categoryId} LIMIT #{key_pager},#{Pager.rowPerPage}
+ 	</select>
+ 	<!-- 根据商品编号查询商品信息 -->
+ 	<select id="getById" parameterType="int" resultMap="getEasybuyProductListMap">
+ 		SELECT `id`,`name`,`description`,`price`,`stock`,`categoryLevel1`,`categoryLevel2`,`categoryLevel3`,`fileName`,`isDelete` FROM `easybuy_product` WHERE `id` = #{id}
+ 	</select>
+ 	<!-- 获得总记录数 -->
+ 	<select id="findTotalCount" resultType="int">
+ 		SELECT COUNT(1) FROM `easybuy_product` 
+ 	</select>
+ 	<!-- 根据ID删除指定商品信息 -->
+ 	<delete id="deleteEasybuyProductById" parameterType="int">
+ 		UPDATE easybuy_product SET `isDelete` = 1 WHERE id = #{id}
+ 	</delete>
+ 	<!-- 商品上架 -->
+ 	<insert id="insertEasybuyProduct" parameterType="EasybuyProduct">
+ 		INSERT INTO `easybuy_product`(`name`,`description`,`price`,`stock`,`categoryLevel1`,`categoryLevel2`,`categoryLevel3`,`fileName`,`isDelete`)
+ 		VALUES(#{name},#{description},#{price},#{stock},#{categoryLevel1},#{categoryLevel2},#{categoryLevel3},#{fileName},#{isDelete})
+ 	</insert>
+ 	<!-- 根据ID查询对应的商品信息 -->
+ 	<select id="findEasybuyProductById" parameterType="int" resultMap="getEasybuyProductListMap">
+ 		SELECT `id`,`name`,`description`,`price`,`stock`,`categoryLevel1`,`categoryLevel2`,`categoryLevel3`,`fileName`,`isDelete` FROM `easybuy_product` WHERE id=#{id}
+ 	</select>
+ 	<resultMap type="EasybuyProduct" id="getEasybuyProductListMap">
+ 		<id column="id" property="id"/>
+ 		<result column="name" property="name"/>
+ 		<result column="description" property="description"/>
+ 		<result column="price" property="price"/>
+ 		<result column="stock" property="stock"/>
+ 		<result column="categoryLevel1" property="categoryLevel1"/>
+ 		<result column="categoryLevel2" property="categoryLevel2"/>
+ 		<result column="categoryLevel3" property="categoryLevel3"/>
+ 		<result column="fileName" property="fileName"/>
+ 		<result column="isDelete" property="isDelete"/>
+ 	</resultMap>
+ </mapper>
